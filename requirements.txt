@@ -1,0 +1,5 @@
+pytest>=8.0.0
+
+# Planned extraction/data dependencies
+pandas>=2.2.0
+pdfplumber>=0.11.0
