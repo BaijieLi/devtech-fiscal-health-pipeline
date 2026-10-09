@@ -26,6 +26,8 @@ phase.
 Responsible for finding candidate line items and numeric values in financial
 statements. Future implementation may combine table parsing, text patterns, and
 layout-aware heuristics.
+The current PDF prototype scans extracted page text and records page-level
+candidate matches so analysts can review source lines before accepting values.
 
 ### Normalization
 
@@ -44,3 +46,5 @@ data without needing private source documents.
 
 Planned outputs include normalized records, ratio tables, quality summaries, and
 dashboard-ready tables.
+Current local PDF extraction outputs are candidate CSV files under `outputs/`,
+which is ignored by Git.

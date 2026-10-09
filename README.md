@@ -38,15 +38,20 @@ CSV / SQL-ready outputs + dashboard-ready tables
 
 ## Current Repository Status
 
-This is a fresh GitHub project scaffold. The first implemented module is the
-ratio computation layer, using synthetic test data only.
+This is a working prototype scaffold with:
+
+- synthetic CSV and JSON examples
+- canonical normalization helpers
+- a tested 12-ratio computation layer
+- local Supabase PDF backup/restore tooling
+- a first-pass PDF field candidate extractor for private local samples
 
 Next planned steps:
 
-1. Add a small synthetic example dataset.
-2. Build a clean extraction interface for PDF, Markdown, and JSON reports.
-3. Add normalization rules and validation warnings.
-4. Add reproducible pipeline commands.
+1. Review PDF candidate outputs on selected real reports.
+2. Promote reviewed candidates into normalized records.
+3. Add missing-field warnings and extraction confidence scoring.
+4. Connect normalized PDF outputs to the ratio pipeline.
 5. Add dashboard screenshots or a lightweight Streamlit demo.
 
 ## Repository Structure
@@ -63,9 +68,21 @@ Next planned steps:
 ├── src/
 │   └── fiscal_health_pipeline/
 │       ├── __init__.py
+│       ├── cli.py
+│       ├── ingestion.py
+│       ├── normalization.py
+│       ├── pdf_extraction.py
 │       ├── ratios.py
 │       └── schema.py
+├── scripts/
+│   ├── download_supabase_pdfs.py
+│   ├── extract_pdf_candidates.py
+│   └── upload_supabase_pdfs.py
 ├── tests/
+│   ├── test_cli.py
+│   ├── test_ingestion.py
+│   ├── test_normalization.py
+│   ├── test_pdf_extraction.py
 │   └── test_ratios.py
 ├── pyproject.toml
 ├── requirements.txt
@@ -98,11 +115,21 @@ python -m fiscal_health_pipeline.cli \
   --output outputs/synthetic_json_ratio_results.csv
 ```
 
+Extract field candidates from private local PDFs:
+
+```bash
+PYTHONPATH=src python scripts/extract_pdf_candidates.py \
+  data/raw/private/supabase_backup/testing_subset \
+  --recursive \
+  --limit 5 \
+  --output outputs/pdf_field_candidates_sample.csv
+```
+
 ## Core Features Planned
 
-- Ingest normalized CSV and nested JSON examples.
-- Ingest fiscal reports from PDF and Markdown in later phases.
-- Extract government-wide and fund-level financial components.
+- Ingest normalized CSV, nested JSON examples, and private local PDF samples.
+- Ingest Markdown in later phases.
+- Extract government-wide and fund-level financial field candidates.
 - Normalize fields into a consistent schema.
 - Compute 12 Virginia fiscal health ratios with missing-value handling.
 - Produce traceable, machine-readable outputs for review and visualization.
@@ -126,3 +153,7 @@ To back up private PDFs locally before changing a Supabase project, see
 
 The same guide also explains how to upload the local backup into a new Supabase
 Storage bucket.
+
+The PDF candidate extractor writes traceable page and line-level matches to
+ignored local outputs for review before promoting any values into normalized
+records.
