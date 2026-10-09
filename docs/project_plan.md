@@ -34,6 +34,6 @@
 ## Phase 4: Portfolio Polish
 
 - Add example outputs from public or synthetic data.
-- Add screenshots or dashboard demo.
+- Add screenshots or dashboard demo. Done for aggregate audit report preview.
 - Add resume bullets and technical summary. Done.
 - Review the repo for private data, class-only wording, and unnecessary files.

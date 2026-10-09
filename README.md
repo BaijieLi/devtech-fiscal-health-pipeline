@@ -96,6 +96,8 @@ stopping the batch.
 See `docs/audit_summary.md` for the aggregate metrics. Raw PDFs and generated
 outputs are intentionally excluded from Git.
 
+![Fiscal Health PDF Audit Report Preview](docs/assets/audit_report_preview.png)
+
 ## Portfolio Materials
 
 - `docs/audit_summary.md`: aggregate full-batch audit metrics.
