@@ -35,5 +35,5 @@
 
 - Add example outputs from public or synthetic data.
 - Add screenshots or dashboard demo.
-- Add resume bullets and technical summary.
+- Add resume bullets and technical summary. Done.
 - Review the repo for private data, class-only wording, and unnecessary files.

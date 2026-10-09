@@ -1,12 +1,36 @@
 # DevTech Fiscal Health Pipeline
 
-End-to-end prototype for extracting local government financial data from
-CAFR/ACFR reports, normalizing it into an analysis-ready schema, and computing
-Virginia fiscal health ratios.
+Portfolio-ready Python pipeline for extracting local government financial data
+from CAFR/ACFR PDFs, normalizing it into an analysis-ready schema, computing
+Virginia fiscal health ratios, and auditing draft extraction quality.
 
-This repository is being rebuilt as a clean public-facing project. It does not
-include legacy class exports, old generated CSVs, raw client documents, or
-private data.
+The repository is intentionally public-safe: it includes source code,
+synthetic examples, documentation, and aggregate audit metrics, but excludes raw
+private PDFs, Supabase credentials, generated review outputs, and legacy class
+exports.
+
+## Highlights
+
+- Extracts fiscal field candidates from messy municipal PDF text using
+  traceable page and line-level matches.
+- Promotes candidates into a canonical fiscal schema while preserving selected
+  source lines for analyst review.
+- Computes 12 Virginia fiscal health ratios with missing-value and zero-
+  denominator handling.
+- Flags draft records with missing core fields, suspicious values, negative
+  values, and unusually large ratio outputs.
+- Continues full-batch processing when individual PDFs are malformed by logging
+  extraction errors instead of failing the run.
+- Generates aggregate audit summaries and a static HTML report for portfolio
+  screenshots.
+
+## Tech Stack
+
+- Python 3.10+
+- pdfplumber for PDF text extraction
+- pandas-ready CSV outputs
+- pytest for automated tests
+- Supabase Storage backup/restore scripts for private local document workflows
 
 ## Project Goal
 
@@ -41,7 +65,7 @@ CSV / SQL-ready outputs + dashboard-ready tables
 
 ## Current Repository Status
 
-This is a working prototype scaffold with:
+This is a working prototype with:
 
 - synthetic CSV and JSON examples
 - canonical normalization helpers
@@ -51,13 +75,15 @@ This is a working prototype scaffold with:
 - PDF candidate promotion and draft-record quality review tooling
 - full-batch audit summary tooling for private local PDF runs
 - a static HTML audit report generator for portfolio screenshots
+- 34 automated tests covering ingestion, extraction, promotion, validation,
+  ratios, summaries, and report rendering
 
 Next planned steps:
 
 1. Add a dashboard screenshot generated from the local HTML audit report.
 2. Improve fund-balance and government-wide revenue extraction heuristics.
 3. Add Markdown parser.
-4. Prepare resume bullets and project summary.
+4. Add a small public or synthetic dashboard dataset for safe demos.
 
 ## Local Audit Snapshot
 
@@ -70,6 +96,13 @@ stopping the batch.
 See `docs/audit_summary.md` for the aggregate metrics. Raw PDFs and generated
 outputs are intentionally excluded from Git.
 
+## Portfolio Materials
+
+- `docs/audit_summary.md`: aggregate full-batch audit metrics.
+- `docs/resume_bullets.md`: role-specific resume bullet options.
+- `docs/architecture.md`: pipeline design and component responsibilities.
+- `docs/ratio_definitions.md`: definitions for the 12 fiscal health ratios.
+
 ## Repository Structure
 
 ```text
@@ -80,6 +113,7 @@ outputs are intentionally excluded from Git.
 │   ├── data_dictionary.md
 │   ├── project_plan.md
 │   ├── ratio_definitions.md
+│   ├── resume_bullets.md
 │   ├── requirements.md
 │   └── supabase_setup.md
 ├── src/
@@ -198,16 +232,31 @@ PYTHONPATH=src python -m fiscal_health_pipeline.cli \
   --output outputs/pdf_draft_ratio_results.csv
 ```
 
-## Core Features Planned
+## Core Features
 
 - Ingest normalized CSV, nested JSON examples, and private local PDF samples.
-- Ingest Markdown in later phases.
 - Extract government-wide and fund-level financial field candidates.
 - Normalize fields into a consistent schema.
 - Flag draft records that need review before downstream analysis.
 - Continue full-batch processing when individual PDFs fail to parse.
 - Compute 12 Virginia fiscal health ratios with missing-value handling.
 - Produce traceable, machine-readable outputs for review and visualization.
+
+## Planned Extensions
+
+- Add Markdown ingestion.
+- Add a screenshot or hosted demo using synthetic or aggregate-only data.
+- Improve table-aware extraction for fund-balance and government-wide revenue
+  variants.
+
+## Current Limitations
+
+- PDF-derived records are draft outputs and should be reviewed before being
+  used for analysis or presentation.
+- Some financial statement fields still require stronger table-aware heuristics,
+  especially fund balance and government-wide revenue variants.
+- The public repository uses synthetic examples because the local PDF corpus is
+  private.
 
 ## Example Data
 
@@ -231,7 +280,5 @@ Storage bucket.
 
 The PDF candidate extractor writes traceable page and line-level matches to
 ignored local outputs for review before promoting any values into normalized
-records.
-
-PDF-derived normalized records are draft outputs. Run the quality review script
-before using those records for analysis or presentation.
+records. Run the quality review script before using PDF-derived records for
+analysis or presentation.
