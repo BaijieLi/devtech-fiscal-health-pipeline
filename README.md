@@ -125,6 +125,15 @@ PYTHONPATH=src python scripts/extract_pdf_candidates.py \
   --output outputs/pdf_field_candidates_sample.csv
 ```
 
+Promote candidate rows into draft normalized records and review trace:
+
+```bash
+PYTHONPATH=src python scripts/promote_pdf_candidates.py \
+  outputs/pdf_field_candidates_sample.csv \
+  --records-output outputs/pdf_draft_normalized_records.csv \
+  --trace-output outputs/pdf_draft_trace.csv
+```
+
 ## Core Features Planned
 
 - Ingest normalized CSV, nested JSON examples, and private local PDF samples.

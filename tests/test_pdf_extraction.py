@@ -63,3 +63,16 @@ def test_candidate_matching_avoids_substring_and_percent_noise():
 
     assert assigned_values == ["1,500,000"]
     assert unassigned_values == ["0"]
+
+
+def test_number_parser_ignores_table_dashes():
+    pages = [
+        PageText(
+            page_number=8,
+            text="Principal Retirement 323,687 - - - - - 323,687",
+        )
+    ]
+
+    candidates = find_field_candidates(pages)
+
+    assert candidates[0].value_text == "323,687"

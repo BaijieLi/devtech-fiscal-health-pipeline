@@ -43,7 +43,7 @@ FIELD_PATTERNS: dict[str, tuple[str, ...]] = {
     ),
 }
 
-NUMBER_RE = re.compile(r"\(?-?\$?\s*\d[\d,]*(?:\.\d+)?\)?")
+NUMBER_RE = re.compile(r"\(?\$?\s*(?:-\d|\d)[\d,]*(?:\.\d+)?\)?")
 YEAR_RE = re.compile(r"^(?:19|20)\d{2}$")
 
 
@@ -121,7 +121,12 @@ def _normalize_line(line: str) -> str:
 
 
 def _parse_number_text(value: str) -> str:
-    return re.sub(r"\s+", "", value.replace("$", ""))
+    normalized = re.sub(r"\s+", "", value.replace("$", ""))
+    # A table dash immediately after a value is often captured as trailing
+    # punctuation, not a negative sign.
+    if normalized.startswith("-"):
+        return "-" + normalized[1:].replace("-", "")
+    return normalized.replace("-", "")
 
 
 def _looks_financial_number(raw_value: str) -> bool:

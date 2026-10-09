@@ -18,6 +18,7 @@
 
 - Add safe Supabase local configuration documentation. Done.
 - Add PDF parsing prototype. Done for text candidate extraction.
+- Promote PDF candidates into draft normalized records. Done.
 - Add Markdown parser.
 - Add extraction confidence and warning fields.
 

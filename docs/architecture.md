@@ -35,6 +35,8 @@ Responsible for converting extracted fields into a consistent schema, including
 unit scaling, locality naming, fiscal year parsing, and field validation.
 The current implementation normalizes common snake_case and camelCase fields
 from synthetic examples into the canonical ratio schema.
+PDF candidate promotion creates draft normalized records plus a trace CSV; these
+records remain review-first outputs until selected values are audited.
 
 ### Ratio Engine
 
