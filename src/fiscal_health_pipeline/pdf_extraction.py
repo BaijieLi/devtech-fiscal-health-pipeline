@@ -129,27 +129,66 @@ def _parse_number_text(value: str) -> str:
     return normalized.replace("-", "")
 
 
+def _repair_split_currency_numbers(line: str) -> str:
+    """Repair PDF text like ``$ 6 6.7`` or ``$ 2 ,906,304``."""
+
+    def repair(match: re.Match[str]) -> str:
+        return re.sub(r"\s+", "", match.group(0))
+
+    return re.sub(r"\$\s*\(?\s*\d[\d\s,.)]*", repair, line)
+
+
 def _looks_financial_number(raw_value: str) -> bool:
     cleaned = re.sub(r"[^0-9]", "", raw_value)
+    has_thousands_comma = re.search(r"\d{1,3},\d{3}", raw_value) is not None
+    has_financial_marker = (
+        "$" in raw_value
+        or has_thousands_comma
+        or "(" in raw_value
+        or "." in raw_value
+    )
+    if not has_financial_marker and YEAR_RE.fullmatch(cleaned):
+        return False
     return (
         "$" in raw_value
-        or "," in raw_value
+        or has_thousands_comma
         or "(" in raw_value
         or len(cleaned) >= 4
     )
 
 
 def _line_numbers(line: str) -> list[str]:
+    repaired_line = _repair_split_currency_numbers(line)
     return [
         _parse_number_text(match.group(0))
-        for match in NUMBER_RE.finditer(line)
+        for match in NUMBER_RE.finditer(repaired_line)
         if _looks_financial_number(match.group(0))
     ]
 
 
-def _phrase_matches(line_lower: str, phrase: str) -> bool:
+def _phrase_match(line_lower: str, phrase: str) -> re.Match[str] | None:
     pattern = r"\b" + r"\s+".join(re.escape(part) for part in phrase.split()) + r"\b"
-    return re.search(pattern, line_lower) is not None
+    return re.search(pattern, line_lower)
+
+
+def _candidate_numbers_for_match(
+    line: str, match: re.Match[str]
+) -> tuple[list[str], float]:
+    """Return nearby numbers and confidence for a matched field phrase."""
+
+    after_text = line[match.end() :]
+    same_sentence_after = re.split(r"(?<=[.;])\s+", after_text, maxsplit=1)[0]
+    after_values = _line_numbers(same_sentence_after)
+    if after_values:
+        return after_values, 0.65
+
+    before_text = line[: match.start()]
+    same_sentence_before = re.split(r"[.;]", before_text)[-1]
+    before_values = _line_numbers(same_sentence_before)
+    if before_values:
+        return before_values, 0.55
+
+    return [], 0.0
 
 
 def find_field_candidates(pages: Iterable[PageText]) -> list[FieldCandidate]:
@@ -170,22 +209,29 @@ def find_field_candidates(pages: Iterable[PageText]) -> list[FieldCandidate]:
 
             for field_name, patterns in FIELD_PATTERNS.items():
                 for pattern in patterns:
-                    if _phrase_matches(line_lower, pattern):
-                        key = (field_name, page.page_number, line)
-                        if key in seen:
-                            continue
-                        seen.add(key)
-                        candidates.append(
-                            FieldCandidate(
-                                field_name=field_name,
-                                matched_pattern=pattern,
-                                value_text=values[-1],
-                                page_number=page.page_number,
-                                line_text=line,
-                                confidence=0.65,
-                            )
-                        )
+                    match = _phrase_match(line_lower, pattern)
+                    if not match:
+                        continue
+                    candidate_values, confidence = _candidate_numbers_for_match(
+                        line, match
+                    )
+                    if not candidate_values:
                         break
+                    key = (field_name, page.page_number, line)
+                    if key in seen:
+                        break
+                    seen.add(key)
+                    candidates.append(
+                        FieldCandidate(
+                            field_name=field_name,
+                            matched_pattern=pattern,
+                            value_text=candidate_values[-1],
+                            page_number=page.page_number,
+                            line_text=line,
+                            confidence=confidence,
+                        )
+                    )
+                    break
 
     return candidates
 

@@ -44,6 +44,32 @@ def test_scaled_candidate_value_uses_million_hint():
     assert value == 7200000.0
 
 
+def test_scaled_candidate_value_uses_decimal_table_million_heuristic():
+    value = scaled_candidate_value(
+        {
+            "candidate_value": "756.6",
+            "line_text": (
+                "Total liabilities and deferred inflows 504.4 515.5 397.4 "
+                "241.1 901.8 756.6"
+            ),
+        }
+    )
+
+    assert value == 756600000.0
+
+
+def test_scaled_candidate_value_treats_debt_service_costs_as_positive():
+    value = scaled_candidate_value(
+        {
+            "field_name": "debt_service_interest",
+            "candidate_value": "(855)",
+            "line_text": "Interest expense (855) - (855)",
+        }
+    )
+
+    assert value == 855.0
+
+
 def test_promote_candidates_creates_record_and_trace():
     records, trace = promote_candidates(
         [

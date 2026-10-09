@@ -44,7 +44,7 @@ This is a working prototype scaffold with:
 - canonical normalization helpers
 - a tested 12-ratio computation layer
 - local Supabase PDF backup/restore tooling
-- a first-pass PDF field candidate extractor for private local samples
+- a PDF field candidate extractor with basic layout-noise handling
 - PDF candidate promotion and draft-record quality review tooling
 
 Next planned steps:

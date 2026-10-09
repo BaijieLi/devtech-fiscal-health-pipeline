@@ -76,3 +76,77 @@ def test_number_parser_ignores_table_dashes():
     candidates = find_field_candidates(pages)
 
     assert candidates[0].value_text == "323,687"
+
+
+def test_number_parser_repairs_split_currency_numbers():
+    pages = [
+        PageText(
+            page_number=29,
+            text=(
+                "Total revenues $ 190.7 $1 90.5 $ 18.7 "
+                "$ 1 5.6 $2 09.3 $2 06.1 $ 73.9 $ 6 6.7"
+            ),
+        )
+    ]
+
+    candidates = find_field_candidates(pages)
+
+    assert candidates[0].value_text == "66.7"
+
+
+def test_candidate_matching_skips_numbers_from_next_sentence():
+    pages = [
+        PageText(
+            page_number=39,
+            text=(
+                "increase in capital contributions coupled with a reduction in "
+                "interest expense. Total operating revenues of $60.0"
+            ),
+        )
+    ]
+
+    candidates = find_field_candidates(pages)
+
+    assert candidates == []
+
+
+def test_candidate_matching_accepts_same_sentence_number_before_phrase():
+    pages = [
+        PageText(
+            page_number=9,
+            text="Of this amount, ($41,412) represents unrestricted net assets.",
+        )
+    ]
+
+    candidates = find_field_candidates(pages)
+
+    assert candidates[0].field_name == "unrestricted_net_position"
+    assert candidates[0].value_text == "(41,412)"
+    assert candidates[0].confidence == 0.55
+
+
+def test_candidate_matching_ignores_trailing_fiscal_year():
+    pages = [
+        PageText(
+            page_number=32,
+            text="The total fund balance increased by $2.0 million in FY 2025",
+        )
+    ]
+
+    candidates = find_field_candidates(pages)
+
+    assert candidates[0].field_name == "total_fund_balance"
+    assert candidates[0].value_text == "2.0"
+
+
+def test_candidate_matching_ignores_calendar_date_noise():
+    pages = [
+        PageText(
+            page_number=35,
+            text="The City's rated debt investments as of June 30, 2017 were rated.",
+        )
+    ]
+
+    candidates = find_field_candidates(pages)
+
+    assert candidates == []

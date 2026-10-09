@@ -29,6 +29,8 @@ statements. Future implementation may combine table parsing, text patterns, and
 layout-aware heuristics.
 The current PDF prototype scans extracted page text and records page-level
 candidate matches so analysts can review source lines before accepting values.
+It also handles common PDF text artifacts such as split currency values, fiscal
+years near narrative amounts, and date fragments that resemble small numbers.
 
 ### Normalization
 

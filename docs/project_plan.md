@@ -21,6 +21,8 @@
 - Promote PDF candidates into draft normalized records. Done.
 - Add draft-record quality review. Done for missing fields, suspicious values,
   and unusually large ratios.
+- Improve PDF extraction heuristics from quality findings. Done for split
+  currency values, fiscal-year noise, and date fragments.
 - Add Markdown parser.
 - Improve extraction confidence and field-specific warning rules.
 

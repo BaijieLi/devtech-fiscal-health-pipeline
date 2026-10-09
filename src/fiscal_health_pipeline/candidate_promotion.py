@@ -30,12 +30,24 @@ def scaled_candidate_value(candidate: Mapping[str, object]) -> float | None:
     if value is None:
         return None
     line = str(candidate.get("line_text", "")).lower()
+    candidate_value = str(candidate.get("candidate_value", ""))
+    field_name = str(candidate.get("field_name", ""))
+    if field_name in {"debt_service_interest", "debt_service_principal"}:
+        value = abs(value)
     if "billion" in line:
         return value * 1_000_000_000
     if "million" in line:
         return value * 1_000_000
     if "thousand" in line:
         return value * 1_000
+    decimal_values = re.findall(r"\b\d{1,3}\.\d+\b", line)
+    if (
+        "." in candidate_value
+        and "," not in candidate_value
+        and len(decimal_values) >= 3
+        and 0 < abs(value) < 10_000
+    ):
+        return value * 1_000_000
     return value
 
 
@@ -64,6 +76,11 @@ def _line_score(candidate: Mapping[str, object]) -> float:
         score += 0.05
     if re.search(r"\d,\d{3}", line):
         score += 0.05
+    value = scaled_candidate_value(candidate)
+    if value is not None and abs(value) >= 1_000_000:
+        score += 0.2
+    if any(word in line for word in ("increase", "increased", "decrease", "decreased")):
+        score -= 0.05
     # Prefer statement/table rows over narrative management discussion.
     if len(line) > 180:
         score -= 0.1
