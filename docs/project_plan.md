@@ -16,6 +16,7 @@
 
 ## Phase 3: Document Extraction Prototype
 
+- Add safe Supabase local configuration documentation. Done.
 - Add Markdown parser.
 - Add PDF parsing prototype.
 - Add extraction confidence and warning fields.

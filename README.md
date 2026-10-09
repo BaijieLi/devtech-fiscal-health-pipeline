@@ -58,7 +58,8 @@ Next planned steps:
 │   ├── data_dictionary.md
 │   ├── project_plan.md
 │   ├── ratio_definitions.md
-│   └── requirements.md
+│   ├── requirements.md
+│   └── supabase_setup.md
 ├── src/
 │   └── fiscal_health_pipeline/
 │       ├── __init__.py
@@ -116,3 +117,9 @@ or raw school project files.
 
 Raw financial reports and generated outputs should stay out of the public repo
 unless they are public, documented, and intentionally included.
+
+For private Supabase Storage files, use a local `.env` file based on
+`.env.example`; never commit real keys.
+
+To back up private PDFs locally before changing a Supabase project, see
+`docs/supabase_setup.md`.
