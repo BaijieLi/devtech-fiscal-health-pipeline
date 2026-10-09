@@ -27,6 +27,7 @@
   categories, and field coverage.
 - Add extraction error logging for malformed PDFs. Done.
 - Document local full-run audit results without committing private outputs. Done.
+- Add static HTML audit report renderer. Done.
 - Add Markdown parser.
 - Improve extraction confidence and field-specific warning rules.
 

@@ -50,12 +50,13 @@ This is a working prototype scaffold with:
 - a PDF field candidate extractor with basic layout-noise handling
 - PDF candidate promotion and draft-record quality review tooling
 - full-batch audit summary tooling for private local PDF runs
+- a static HTML audit report generator for portfolio screenshots
 
 Next planned steps:
 
-1. Improve fund-balance and government-wide revenue extraction heuristics.
-2. Add Markdown parser.
-3. Add dashboard screenshots or a lightweight Streamlit demo.
+1. Add a dashboard screenshot generated from the local HTML audit report.
+2. Improve fund-balance and government-wide revenue extraction heuristics.
+3. Add Markdown parser.
 4. Prepare resume bullets and project summary.
 
 ## Local Audit Snapshot
@@ -84,6 +85,7 @@ outputs are intentionally excluded from Git.
 ├── src/
 │   └── fiscal_health_pipeline/
 │       ├── __init__.py
+│       ├── audit_report.py
 │       ├── audit_summary.py
 │       ├── candidate_promotion.py
 │       ├── cli.py
@@ -97,10 +99,12 @@ outputs are intentionally excluded from Git.
 │   ├── download_supabase_pdfs.py
 │   ├── extract_pdf_candidates.py
 │   ├── promote_pdf_candidates.py
+│   ├── render_audit_report.py
 │   ├── review_pdf_drafts.py
 │   ├── summarize_quality_review.py
 │   └── upload_supabase_pdfs.py
 ├── tests/
+│   ├── test_audit_report.py
 │   ├── test_audit_summary.py
 │   ├── test_candidate_promotion.py
 │   ├── test_cli.py
@@ -176,6 +180,14 @@ PYTHONPATH=src python scripts/summarize_quality_review.py \
   outputs/pdf_draft_quality_review.csv \
   --records-csv outputs/pdf_draft_normalized_records.csv \
   --output outputs/pdf_draft_audit_summary.csv
+```
+
+Render a local static HTML audit report:
+
+```bash
+PYTHONPATH=src python scripts/render_audit_report.py \
+  outputs/pdf_draft_audit_summary.csv \
+  --output outputs/pdf_draft_audit_report.html
 ```
 
 Compute ratios from reviewed draft records:

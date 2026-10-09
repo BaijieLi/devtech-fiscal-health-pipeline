@@ -69,3 +69,5 @@ stays separate from generated private review artifacts.
 Audit summary outputs aggregate review status, warning categories, and field
 coverage so pipeline quality can be tracked without exposing source PDFs.
 The latest local full-batch summary is documented in `docs/audit_summary.md`.
+The static audit report renderer converts those aggregate CSV metrics into a
+local HTML page suitable for screenshots and portfolio review.
