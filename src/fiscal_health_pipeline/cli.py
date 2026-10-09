@@ -7,17 +7,13 @@ import csv
 from pathlib import Path
 from typing import Iterable
 
+from .ingestion import read_input_records
+from .normalization import normalize_records
 from .ratios import RATIO_LABELS, compute_ratios
+from .schema import CANONICAL_FIELDS
 
-METADATA_FIELDS = ("locality", "fiscal_year")
 
-
-def read_records(path: str | Path) -> list[dict[str, str]]:
-    """Read normalized fiscal records from a CSV file."""
-
-    input_path = Path(path)
-    with input_path.open(newline="", encoding="utf-8") as file:
-        return list(csv.DictReader(file))
+RATIO_METADATA_FIELDS = ("locality", "fiscal_year", "source_file", "report_type")
 
 
 def build_ratio_rows(records: Iterable[dict[str, str]]) -> list[dict[str, object]]:
@@ -27,8 +23,7 @@ def build_ratio_rows(records: Iterable[dict[str, str]]) -> list[dict[str, object
     for record in records:
         ratios = compute_ratios(record)
         row: dict[str, object] = {
-            "locality": record.get("locality", ""),
-            "fiscal_year": record.get("fiscal_year", ""),
+            field: record.get(field, "") for field in RATIO_METADATA_FIELDS
         }
         for ratio_name in RATIO_LABELS:
             value = ratios[ratio_name]
@@ -42,31 +37,53 @@ def write_ratio_output(rows: list[dict[str, object]], path: str | Path) -> None:
 
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = [*METADATA_FIELDS, *RATIO_LABELS.keys()]
+    fieldnames = [*RATIO_METADATA_FIELDS, *RATIO_LABELS.keys()]
     with output_path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
 
 
-def run(input_path: str | Path, output_path: str | Path) -> int:
-    """Read normalized records, compute ratios, and write a CSV output."""
+def write_normalized_output(rows: list[dict[str, object]], path: str | Path) -> None:
+    """Write normalized records to a CSV file."""
 
-    records = read_records(input_path)
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=CANONICAL_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def run(
+    input_path: str | Path,
+    output_path: str | Path,
+    normalized_output_path: str | Path | None = None,
+) -> int:
+    """Read records, normalize them, compute ratios, and write CSV output."""
+
+    raw_records = read_input_records(input_path)
+    records = normalize_records(raw_records)
     rows = build_ratio_rows(records)
     write_ratio_output(rows, output_path)
+    if normalized_output_path:
+        write_normalized_output(records, normalized_output_path)
     return len(rows)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Compute Virginia fiscal health ratios from normalized CSV data."
+        description="Compute Virginia fiscal health ratios from CSV or JSON records."
     )
-    parser.add_argument("input", help="Path to a normalized fiscal records CSV.")
+    parser.add_argument("input", help="Path to a fiscal records CSV or JSON file.")
     parser.add_argument(
         "--output",
         default="outputs/ratio_results.csv",
         help="Path for the generated ratio CSV.",
+    )
+    parser.add_argument(
+        "--normalized-output",
+        help="Optional path for the normalized records CSV.",
     )
     return parser
 
@@ -74,7 +91,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    count = run(args.input, args.output)
+    count = run(args.input, args.output, args.normalized_output)
     print(f"Wrote {count} ratio row(s) to {args.output}")
     return 0
 

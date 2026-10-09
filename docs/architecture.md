@@ -16,8 +16,10 @@ input report
 
 ### Ingestion
 
-Responsible for loading PDF, Markdown, or JSON files and passing them to the
-appropriate parser.
+Responsible for loading supported input files and passing them to the
+appropriate parser. The current implementation supports normalized CSV and
+nested JSON examples. PDF and Markdown extraction will be added in a later
+phase.
 
 ### Extraction
 
@@ -29,6 +31,8 @@ layout-aware heuristics.
 
 Responsible for converting extracted fields into a consistent schema, including
 unit scaling, locality naming, fiscal year parsing, and field validation.
+The current implementation normalizes common snake_case and camelCase fields
+from synthetic examples into the canonical ratio schema.
 
 ### Ratio Engine
 

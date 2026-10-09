@@ -88,9 +88,19 @@ python -m fiscal_health_pipeline.cli \
   --output outputs/synthetic_ratio_results.csv
 ```
 
+Run the nested JSON example and write both normalized records and ratios:
+
+```bash
+python -m fiscal_health_pipeline.cli \
+  data/examples/synthetic_fiscal_records.json \
+  --normalized-output outputs/synthetic_normalized_records.csv \
+  --output outputs/synthetic_json_ratio_results.csv
+```
+
 ## Core Features Planned
 
-- Ingest fiscal reports from PDF, Markdown, or JSON.
+- Ingest normalized CSV and nested JSON examples.
+- Ingest fiscal reports from PDF and Markdown in later phases.
 - Extract government-wide and fund-level financial components.
 - Normalize fields into a consistent schema.
 - Compute 12 Virginia fiscal health ratios with missing-value handling.

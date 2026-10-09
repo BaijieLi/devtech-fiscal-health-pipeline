@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 
 @dataclass(frozen=True)
@@ -11,6 +11,8 @@ class FiscalRecord:
 
     locality: str
     fiscal_year: int
+    source_file: str = ""
+    report_type: str = ""
     cash_and_equivalents: float | None = None
     investments: float | None = None
     current_liabilities: float | None = None
@@ -38,3 +40,10 @@ class FiscalRecord:
     enterprise_change_in_net_position: float | None = None
     enterprise_net_transfers: float | None = None
     enterprise_total_expenses: float | None = None
+
+
+METADATA_FIELDS = ("locality", "fiscal_year", "source_file", "report_type")
+NUMERIC_FIELDS = tuple(
+    field.name for field in fields(FiscalRecord) if field.name not in METADATA_FIELDS
+)
+CANONICAL_FIELDS = (*METADATA_FIELDS, *NUMERIC_FIELDS)

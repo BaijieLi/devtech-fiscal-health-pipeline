@@ -1,0 +1,90 @@
+{
+  "records": [
+    {
+      "metadata": {
+        "locality": "Example City",
+        "fiscalYear": 2025,
+        "sourceFile": "synthetic_example_city_2025.json",
+        "reportType": "synthetic"
+      },
+      "governmentWide": {
+        "cashAndEquivalents": 13500000,
+        "investments": 3200000,
+        "currentLiabilities": 5400000,
+        "totalLiabilities": 31500000,
+        "unrestrictedNetPosition": 22400000,
+        "totalExpenses": 52200000,
+        "chargesForServices": 8400000,
+        "generalRevenues": 44600000,
+        "netPositionBeginning": 110000000,
+        "netPositionEnding": 118000000
+      },
+      "debt": {
+        "totalTaxSupportedDebt": 26800000,
+        "fmvTaxableRealEstate": 520000000,
+        "assessedTangiblePersonalProperty": 85000000,
+        "assessedPublicServiceCorporations": 21500000
+      },
+      "funds": {
+        "unassignedFundBalance": 11200000,
+        "assignedFundBalance": 4200000,
+        "committedFundBalance": 6200000,
+        "otherCommittedReserves": 0,
+        "totalFundBalance": 27200000,
+        "totalRevenues": 63200000,
+        "debtServicePrincipal": 3200000,
+        "debtServiceInterest": 1200000,
+        "priorUnassignedFundBalance": 10000000,
+        "intergovernmentalOperatingRevenues": 9500000
+      },
+      "enterprise": {
+        "enterpriseChangeInNetPosition": 7300000,
+        "enterpriseNetTransfers": 1800000,
+        "enterpriseTotalExpenses": 26000000
+      }
+    },
+    {
+      "metadata": {
+        "locality": "Sample County",
+        "fiscalYear": 2025,
+        "sourceFile": "synthetic_sample_county_2025.json",
+        "reportType": "synthetic"
+      },
+      "governmentWide": {
+        "cashAndEquivalents": 9100000,
+        "investments": 1800000,
+        "currentLiabilities": 7600000,
+        "totalLiabilities": 44000000,
+        "unrestrictedNetPosition": 13800000,
+        "totalExpenses": 67200000,
+        "chargesForServices": 6500000,
+        "generalRevenues": 53900000,
+        "netPositionBeginning": 86000000,
+        "netPositionEnding": 90100000
+      },
+      "debt": {
+        "totalTaxSupportedDebt": 43500000,
+        "fmvTaxableRealEstate": 741000000,
+        "assessedTangiblePersonalProperty": 101000000,
+        "assessedPublicServiceCorporations": 38100000
+      },
+      "funds": {
+        "unassignedFundBalance": 8200000,
+        "assignedFundBalance": 2600000,
+        "committedFundBalance": 4300000,
+        "otherCommittedReserves": 600000,
+        "totalFundBalance": 20500000,
+        "totalRevenues": 73200000,
+        "debtServicePrincipal": 5100000,
+        "debtServiceInterest": 1450000,
+        "priorUnassignedFundBalance": 7600000,
+        "intergovernmentalOperatingRevenues": 19300000
+      },
+      "enterprise": {
+        "enterpriseChangeInNetPosition": 2500000,
+        "enterpriseNetTransfers": 700000,
+        "enterpriseTotalExpenses": 19000000
+      }
+    }
+  ]
+}
