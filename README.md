@@ -45,14 +45,15 @@ This is a working prototype scaffold with:
 - a tested 12-ratio computation layer
 - local Supabase PDF backup/restore tooling
 - a first-pass PDF field candidate extractor for private local samples
+- PDF candidate promotion and draft-record quality review tooling
 
 Next planned steps:
 
-1. Review PDF candidate outputs on selected real reports.
-2. Promote reviewed candidates into normalized records.
-3. Add missing-field warnings and extraction confidence scoring.
-4. Connect normalized PDF outputs to the ratio pipeline.
-5. Add dashboard screenshots or a lightweight Streamlit demo.
+1. Run quality review on selected real-report draft records.
+2. Improve field-specific extraction heuristics from review findings.
+3. Add Markdown parser.
+4. Add dashboard screenshots or a lightweight Streamlit demo.
+5. Prepare resume bullets and project summary.
 
 ## Repository Structure
 
@@ -68,21 +69,27 @@ Next planned steps:
 ├── src/
 │   └── fiscal_health_pipeline/
 │       ├── __init__.py
+│       ├── candidate_promotion.py
 │       ├── cli.py
 │       ├── ingestion.py
 │       ├── normalization.py
 │       ├── pdf_extraction.py
+│       ├── quality_review.py
 │       ├── ratios.py
 │       └── schema.py
 ├── scripts/
 │   ├── download_supabase_pdfs.py
 │   ├── extract_pdf_candidates.py
+│   ├── promote_pdf_candidates.py
+│   ├── review_pdf_drafts.py
 │   └── upload_supabase_pdfs.py
 ├── tests/
+│   ├── test_candidate_promotion.py
 │   ├── test_cli.py
 │   ├── test_ingestion.py
 │   ├── test_normalization.py
 │   ├── test_pdf_extraction.py
+│   ├── test_quality_review.py
 │   └── test_ratios.py
 ├── pyproject.toml
 ├── requirements.txt
@@ -134,12 +141,29 @@ PYTHONPATH=src python scripts/promote_pdf_candidates.py \
   --trace-output outputs/pdf_draft_trace.csv
 ```
 
+Review draft normalized records for missing fields and suspicious values:
+
+```bash
+PYTHONPATH=src python scripts/review_pdf_drafts.py \
+  outputs/pdf_draft_normalized_records.csv \
+  --output outputs/pdf_draft_quality_review.csv
+```
+
+Compute ratios from reviewed draft records:
+
+```bash
+PYTHONPATH=src python -m fiscal_health_pipeline.cli \
+  outputs/pdf_draft_normalized_records.csv \
+  --output outputs/pdf_draft_ratio_results.csv
+```
+
 ## Core Features Planned
 
 - Ingest normalized CSV, nested JSON examples, and private local PDF samples.
 - Ingest Markdown in later phases.
 - Extract government-wide and fund-level financial field candidates.
 - Normalize fields into a consistent schema.
+- Flag draft records that need review before downstream analysis.
 - Compute 12 Virginia fiscal health ratios with missing-value handling.
 - Produce traceable, machine-readable outputs for review and visualization.
 
@@ -166,3 +190,6 @@ Storage bucket.
 The PDF candidate extractor writes traceable page and line-level matches to
 ignored local outputs for review before promoting any values into normalized
 records.
+
+PDF-derived normalized records are draft outputs. Run the quality review script
+before using those records for analysis or presentation.

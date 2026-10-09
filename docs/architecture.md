@@ -8,6 +8,7 @@ input report
   -> extract candidate financial fields
   -> normalize to canonical schema
   -> validate fields
+  -> review draft quality
   -> compute fiscal ratios
   -> export analysis-ready outputs
 ```
@@ -38,6 +39,14 @@ from synthetic examples into the canonical ratio schema.
 PDF candidate promotion creates draft normalized records plus a trace CSV; these
 records remain review-first outputs until selected values are audited.
 
+### Quality Review
+
+Responsible for flagging incomplete or suspicious draft records before they are
+used for ratio analysis. Current checks include missing core fields, negative
+values in fields that should be nonnegative, suspiciously small monetary values,
+and unusually large ratio outputs that often indicate extraction or unit-scaling
+issues.
+
 ### Ratio Engine
 
 Responsible for computing the 12 Virginia fiscal health ratios from normalized
@@ -50,3 +59,5 @@ Planned outputs include normalized records, ratio tables, quality summaries, and
 dashboard-ready tables.
 Current local PDF extraction outputs are candidate CSV files under `outputs/`,
 which is ignored by Git.
+Quality review outputs are also written under `outputs/` so public source code
+stays separate from generated private review artifacts.
