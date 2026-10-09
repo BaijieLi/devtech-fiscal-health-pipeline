@@ -9,6 +9,7 @@ input report
   -> normalize to canonical schema
   -> validate fields
   -> review draft quality
+  -> summarize audit metrics
   -> compute fiscal ratios
   -> export analysis-ready outputs
 ```
@@ -31,6 +32,8 @@ The current PDF prototype scans extracted page text and records page-level
 candidate matches so analysts can review source lines before accepting values.
 It also handles common PDF text artifacts such as split currency values, fiscal
 years near narrative amounts, and date fragments that resemble small numbers.
+Malformed files are logged to an extraction-error CSV so a batch run can
+continue when individual PDFs fail to parse.
 
 ### Normalization
 
@@ -63,3 +66,6 @@ Current local PDF extraction outputs are candidate CSV files under `outputs/`,
 which is ignored by Git.
 Quality review outputs are also written under `outputs/` so public source code
 stays separate from generated private review artifacts.
+Audit summary outputs aggregate review status, warning categories, and field
+coverage so pipeline quality can be tracked without exposing source PDFs.
+The latest local full-batch summary is documented in `docs/audit_summary.md`.

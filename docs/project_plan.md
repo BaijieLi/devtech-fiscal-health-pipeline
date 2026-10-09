@@ -23,6 +23,10 @@
   and unusually large ratios.
 - Improve PDF extraction heuristics from quality findings. Done for split
   currency values, fiscal-year noise, and date fragments.
+- Add full-run audit summary metrics. Done for review status, warning
+  categories, and field coverage.
+- Add extraction error logging for malformed PDFs. Done.
+- Document local full-run audit results without committing private outputs. Done.
 - Add Markdown parser.
 - Improve extraction confidence and field-specific warning rules.
 

@@ -30,6 +30,9 @@ Financial field extraction
 Schema normalization + validation
         |
         v
+Draft quality review + audit summary
+        |
+        v
 12 Virginia fiscal health ratios
         |
         v
@@ -46,14 +49,25 @@ This is a working prototype scaffold with:
 - local Supabase PDF backup/restore tooling
 - a PDF field candidate extractor with basic layout-noise handling
 - PDF candidate promotion and draft-record quality review tooling
+- full-batch audit summary tooling for private local PDF runs
 
 Next planned steps:
 
-1. Run quality review on selected real-report draft records.
-2. Improve field-specific extraction heuristics from review findings.
-3. Add Markdown parser.
-4. Add dashboard screenshots or a lightweight Streamlit demo.
-5. Prepare resume bullets and project summary.
+1. Improve fund-balance and government-wide revenue extraction heuristics.
+2. Add Markdown parser.
+3. Add dashboard screenshots or a lightweight Streamlit demo.
+4. Prepare resume bullets and project summary.
+
+## Local Audit Snapshot
+
+A private local full-batch run scanned 153 PDF files, extracted 2,541 field
+candidate rows, promoted 128 draft normalized records, and wrote 1,023
+selected-value trace rows. The quality review classified 54 records as `PASS`,
+47 as `CAUTION`, and 27 as `REVIEW`; one malformed PDF was logged without
+stopping the batch.
+
+See `docs/audit_summary.md` for the aggregate metrics. Raw PDFs and generated
+outputs are intentionally excluded from Git.
 
 ## Repository Structure
 
@@ -61,6 +75,7 @@ Next planned steps:
 .
 ├── docs/
 │   ├── architecture.md
+│   ├── audit_summary.md
 │   ├── data_dictionary.md
 │   ├── project_plan.md
 │   ├── ratio_definitions.md
@@ -69,6 +84,7 @@ Next planned steps:
 ├── src/
 │   └── fiscal_health_pipeline/
 │       ├── __init__.py
+│       ├── audit_summary.py
 │       ├── candidate_promotion.py
 │       ├── cli.py
 │       ├── ingestion.py
@@ -82,10 +98,13 @@ Next planned steps:
 │   ├── extract_pdf_candidates.py
 │   ├── promote_pdf_candidates.py
 │   ├── review_pdf_drafts.py
+│   ├── summarize_quality_review.py
 │   └── upload_supabase_pdfs.py
 ├── tests/
+│   ├── test_audit_summary.py
 │   ├── test_candidate_promotion.py
 │   ├── test_cli.py
+│   ├── test_extract_pdf_candidates_script.py
 │   ├── test_ingestion.py
 │   ├── test_normalization.py
 │   ├── test_pdf_extraction.py
@@ -129,7 +148,8 @@ PYTHONPATH=src python scripts/extract_pdf_candidates.py \
   data/raw/private/supabase_backup/testing_subset \
   --recursive \
   --limit 5 \
-  --output outputs/pdf_field_candidates_sample.csv
+  --output outputs/pdf_field_candidates_sample.csv \
+  --errors-output outputs/pdf_extraction_errors_sample.csv
 ```
 
 Promote candidate rows into draft normalized records and review trace:
@@ -149,6 +169,15 @@ PYTHONPATH=src python scripts/review_pdf_drafts.py \
   --output outputs/pdf_draft_quality_review.csv
 ```
 
+Summarize review status, warning types, and field coverage:
+
+```bash
+PYTHONPATH=src python scripts/summarize_quality_review.py \
+  outputs/pdf_draft_quality_review.csv \
+  --records-csv outputs/pdf_draft_normalized_records.csv \
+  --output outputs/pdf_draft_audit_summary.csv
+```
+
 Compute ratios from reviewed draft records:
 
 ```bash
@@ -164,6 +193,7 @@ PYTHONPATH=src python -m fiscal_health_pipeline.cli \
 - Extract government-wide and fund-level financial field candidates.
 - Normalize fields into a consistent schema.
 - Flag draft records that need review before downstream analysis.
+- Continue full-batch processing when individual PDFs fail to parse.
 - Compute 12 Virginia fiscal health ratios with missing-value handling.
 - Produce traceable, machine-readable outputs for review and visualization.
 

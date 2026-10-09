@@ -6,7 +6,10 @@ import argparse
 import csv
 from pathlib import Path
 
-from fiscal_health_pipeline.pdf_extraction import extract_pdf_candidates
+from fiscal_health_pipeline.pdf_extraction import (
+    extract_pdf_candidates,
+    infer_metadata_from_path,
+)
 
 
 FIELDNAMES = [
@@ -20,6 +23,15 @@ FIELDNAMES = [
     "page_number",
     "confidence",
     "line_text",
+]
+
+ERROR_FIELDNAMES = [
+    "locality",
+    "fiscal_year",
+    "source_file",
+    "source_path",
+    "error_type",
+    "error_message",
 ]
 
 
@@ -37,12 +49,29 @@ def discover_pdfs(paths: list[str], recursive: bool = False) -> list[Path]:
     return sorted(discovered)
 
 
-def extract_rows(pdf_paths: list[Path], max_pages: int | None) -> list[dict[str, object]]:
+def extract_rows(
+    pdf_paths: list[Path], max_pages: int | None
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     """Extract candidate rows from PDF paths."""
 
     rows: list[dict[str, object]] = []
+    errors: list[dict[str, object]] = []
     for pdf_path in pdf_paths:
-        metadata, candidates = extract_pdf_candidates(pdf_path, max_pages=max_pages)
+        try:
+            metadata, candidates = extract_pdf_candidates(pdf_path, max_pages=max_pages)
+        except Exception as exc:  # pragma: no cover - exact parser errors vary.
+            metadata = infer_metadata_from_path(pdf_path)
+            errors.append(
+                {
+                    "locality": metadata.locality,
+                    "fiscal_year": metadata.fiscal_year or "",
+                    "source_file": metadata.source_file,
+                    "source_path": metadata.source_path,
+                    "error_type": type(exc).__name__,
+                    "error_message": str(exc),
+                }
+            )
+            continue
         for candidate in candidates:
             rows.append(
                 {
@@ -58,7 +87,7 @@ def extract_rows(pdf_paths: list[Path], max_pages: int | None) -> list[dict[str,
                     "line_text": candidate.line_text,
                 }
             )
-    return rows
+    return rows, errors
 
 
 def write_rows(rows: list[dict[str, object]], output_path: str | Path) -> None:
@@ -68,6 +97,17 @@ def write_rows(rows: list[dict[str, object]], output_path: str | Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def write_error_rows(rows: list[dict[str, object]], output_path: str | Path) -> None:
+    """Write extraction error rows to CSV."""
+
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=ERROR_FIELDNAMES)
         writer.writeheader()
         writer.writerows(rows)
 
@@ -94,6 +134,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="outputs/pdf_field_candidates.csv",
         help="Output CSV path.",
     )
+    parser.add_argument(
+        "--errors-output",
+        default="outputs/pdf_extraction_errors.csv",
+        help="CSV path for PDFs that could not be parsed.",
+    )
     return parser
 
 
@@ -104,10 +149,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.limit is not None:
         pdf_paths = pdf_paths[: args.limit]
     max_pages = None if args.max_pages == 0 else args.max_pages
-    rows = extract_rows(pdf_paths, max_pages=max_pages)
+    rows, errors = extract_rows(pdf_paths, max_pages=max_pages)
     write_rows(rows, args.output)
+    write_error_rows(errors, args.errors_output)
     print(f"Scanned {len(pdf_paths)} PDF file(s).")
     print(f"Wrote {len(rows)} candidate row(s) to {args.output}")
+    print(f"Wrote {len(errors)} extraction error row(s) to {args.errors_output}")
     return 0
 
 
