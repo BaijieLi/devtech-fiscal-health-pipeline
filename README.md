@@ -123,3 +123,6 @@ For private Supabase Storage files, use a local `.env` file based on
 
 To back up private PDFs locally before changing a Supabase project, see
 `docs/supabase_setup.md`.
+
+The same guide also explains how to upload the local backup into a new Supabase
+Storage bucket.

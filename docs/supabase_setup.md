@@ -89,3 +89,38 @@ The script also writes a local manifest:
 ```text
 data/raw/private/supabase_backup/download_manifest.csv
 ```
+
+## Upload Backup To A New Supabase Project
+
+After creating a new Supabase project, update the local `.env` file with the new
+project URL, the new local key, and the target bucket name:
+
+```text
+SUPABASE_URL=https://new-project-ref.supabase.co
+SUPABASE_KEY=your-new-local-key
+SUPABASE_BUCKET=testing_subset
+```
+
+Preview the upload first:
+
+```bash
+python scripts/upload_supabase_pdfs.py --dry-run
+```
+
+Then upload and create the bucket if needed:
+
+```bash
+python scripts/upload_supabase_pdfs.py --create-bucket
+```
+
+The uploader preserves the locality/year folder structure from:
+
+```text
+data/raw/private/supabase_backup/testing_subset/
+```
+
+It writes a local upload manifest:
+
+```text
+data/raw/private/supabase_backup/testing_subset/upload_manifest.csv
+```
