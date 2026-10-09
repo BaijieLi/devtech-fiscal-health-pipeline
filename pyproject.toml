@@ -13,6 +13,9 @@ dependencies = [
   "pdfplumber>=0.11.0",
 ]
 
+[project.scripts]
+fiscal-health-ratios = "fiscal_health_pipeline.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

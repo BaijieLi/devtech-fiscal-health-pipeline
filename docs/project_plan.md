@@ -9,10 +9,10 @@
 
 ## Phase 2: Minimal Working Pipeline
 
-- Add a small synthetic input file.
+- Add a small synthetic input file. Done.
 - Add JSON ingestion.
 - Normalize JSON records into the canonical schema.
-- Export ratio results to CSV.
+- Export ratio results to CSV. Done for normalized CSV inputs.
 
 ## Phase 3: Document Extraction Prototype
 

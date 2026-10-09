@@ -80,6 +80,14 @@ pip install -r requirements.txt
 pytest
 ```
 
+Run the synthetic example:
+
+```bash
+python -m fiscal_health_pipeline.cli \
+  data/examples/synthetic_fiscal_records.csv \
+  --output outputs/synthetic_ratio_results.csv
+```
+
 ## Core Features Planned
 
 - Ingest fiscal reports from PDF, Markdown, or JSON.
@@ -87,6 +95,12 @@ pytest
 - Normalize fields into a consistent schema.
 - Compute 12 Virginia fiscal health ratios with missing-value handling.
 - Produce traceable, machine-readable outputs for review and visualization.
+
+## Example Data
+
+The current example dataset is synthetic. It exists only to demonstrate the
+pipeline interface and ratio calculations without exposing private client data
+or raw school project files.
 
 ## Notes
 
